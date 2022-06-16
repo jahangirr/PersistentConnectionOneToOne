@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="Scripts/jquery-3.4.1.min.js"></script>
+    <script src="Scripts/jquery.signalR-2.2.2.js"></script>
+
+    <link href="Content/bootstrap.css" rel="stylesheet" />
+</head>
+<body>
+
+    <script>
+        var userName = prompt('UserName', 'litu');
+    </script>
+    Welcome :
+    <div id="MyUs">
+
+    </div>
+
+    <script>
+        document.getElementById("MyUs").innerHTML = userName;
+    </script>
+
+    <script type="text/javascript">
+
+        function MyValueSet(value) {
+
+            $("#inpHidden").val(value);
+
+        }
+
+        $(document).ready(function () {
+
+            var persistent = $.connection('/onetoone', 'userName=' + userName, true);
+
+            persistent.received(function (data) {
+
+
+                if (data.split('****').length === 2) {
+                    $('#userZone').append("<button type='button' onclick=MyValueSet('" + data.split("****")[0] + "') value='" + data.split("****")[0] + "'>" + data.split("****")[1] + "</button>");
+                } else {
+
+                    $('#AddText').append(data.split('<<<<')[0]).append("</br>");
+
+                }
+
+            });
+
+            persistent.start().done(function () {
+                $('#SubmitButton').click(
+
+                    function () { persistent.send(document.getElementById("inpText").value + '<<<<' + document.getElementById("inpHidden").value); }
+
+                );
+
+            });
+
+        });
+    </script>
+
+    <input type="hidden" id="inpHidden" />
+
+    <div id="userZone"> </div>
+
+    Message :  <input type="text" id="inpText" />
+    <input type="button" id="SubmitButton" value="Say Hello" />
+
+    <div id="AddText"></div>
+
+</body>
+</html>
